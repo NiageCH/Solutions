@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Process — Refrigerant Distribution Traceability</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #f8fafc;
+  color: #111827;
+  padding: 24px 20px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ─── TOKENS ─── */
+:root {
+  --purple:  #7c3aed; --purple-bg: #ede9fe; --purple-bd: #c4b5fd;
+  --teal:    #0f766e; --teal-bg:   #ccfbf1; --teal-bd:   #5eead4;
+  --amber:   #92400e; --amber-bg:  #fef3c7; --amber-bd:  #fcd34d;
+  --blue:    #1e40af; --blue-bg:   #dbeafe; --blue-bd:   #93c5fd;
+  --green:   #14532d; --green-bg:  #dcfce7; --green-bd:  #86efac;
+  --red:     #991b1b; --red-bg:    #fee2e2; --red-bd:    #fca5a5;
+  --gray:    #374151; --gray-bg:   #f3f4f6; --gray-bd:   #d1d5db;
+  --white:   #ffffff;
+  --border:  #e5e7eb;
+}
+
+/* ─── HEADER ─── */
+.main-title { text-align: center; margin-bottom: 28px; }
+.main-title h1 { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+.main-title p  { font-size: 13px; color: #6b7280; }
+
+/* ─── PHASE WRAPPER ─── */
+.phase { margin-bottom: 6px; }
+
+.phase-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; border-radius: 10px 10px 0 0;
+  color: #fff; font-size: 13px; font-weight: 700; letter-spacing: .1px;
+}
+.ph-purple { background: var(--purple); }
+.ph-blue   { background: var(--blue);   }
+.ph-teal   { background: var(--teal);   }
+.ph-amber  { background: #b45309;       }
+.ph-green  { background: var(--green);  }
+
+.phase-body {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 14px 16px 16px;
+}
+
+/* ─── STEP ROW ─── */
+.step-row {
+  display: flex; align-items: stretch; gap: 0;
+  flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px;
+}
+
+/* ─── ARROWS ─── */
+.arr {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 6px; font-size: 20px; color: #9ca3af;
+  flex-shrink: 0; align-self: center;
+}
+.arr-plus {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 6px; font-size: 18px; font-weight: 700; color: #9ca3af;
+  flex-shrink: 0; align-self: center;
+}
+
+/* ─── STEP CARD ─── */
+.step {
+  flex: 1; min-width: 150px; max-width: 260px;
+  border-radius: 8px; padding: 11px 13px 12px;
+  border: 1.5px solid var(--gray-bd);
+  background: var(--gray-bg);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.step h3 { font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.3; }
+.step p  { font-size: 11px; color: #4b5563; line-height: 1.45; flex: 1; }
+
+.step.purple { background: var(--purple-bg); border-color: var(--purple-bd); }
+.step.teal   { background: var(--teal-bg);   border-color: var(--teal-bd);   }
+.step.amber  { background: var(--amber-bg);  border-color: var(--amber-bd);  }
+.step.blue   { background: var(--blue-bg);   border-color: var(--blue-bd);   }
+.step.green  { background: var(--green-bg);  border-color: var(--green-bd);  }
+.step.red    { background: var(--red-bg);    border-color: var(--red-bd);    }
+.step.wide   { flex: 2; max-width: 400px; }
+
+/* ─── BADGE ─── */
+.badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+.badge {
+  font-size: 9px; font-weight: 700; padding: 2px 7px;
+  border-radius: 20px; color: #fff; letter-spacing: .3px; white-space: nowrap;
+}
+.b-rfid   { background: var(--purple); }
+.b-nfc    { background: var(--teal);   }
+.b-qr     { background: var(--blue);   }
+.b-iot    { background: #b45309;       }
+.b-auto   { background: var(--green);  }
+.b-alert  { background: var(--red);    }
+.b-cloud  { background: #0369a1;       }
+
+/* ─── INFO BAR ─── */
+.info-bar {
+  margin-top: 10px; padding: 9px 13px;
+  border-radius: 6px; font-size: 11px; border-left: 3px solid;
+}
+.info-bar.purple { background: var(--purple-bg); border-color: var(--purple); color: var(--purple); font-weight: 600; }
+.info-bar.blue   { background: var(--blue-bg);   border-color: var(--blue);   color: var(--blue);   font-weight: 600; }
+.info-bar.teal   { background: var(--teal-bg);   border-color: var(--teal);   color: var(--teal);   font-weight: 600; }
+.info-bar.amber  { background: var(--amber-bg);  border-color: #b45309;       color: #92400e;       font-weight: 600; }
+.info-bar.green  { background: var(--green-bg);  border-color: var(--green);  color: var(--green);  font-weight: 600; }
+
+/* ─── SECTION LABEL ─── */
+.section-label {
+  font-size: 11px; font-weight: 700; color: #374151;
+  margin: 12px 0 7px; padding-left: 2px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* ─── DECISION BLOCK ─── */
+.decision-block {
+  margin: 12px 0 4px;
+  border: 1.5px dashed var(--gray-bd);
+  border-radius: 8px; padding: 12px 14px;
+  background: var(--gray-bg);
+}
+.decision-block .q {
+  font-size: 12px; font-weight: 700; color: #374151;
+  margin-bottom: 10px; text-align: center;
+}
+.dec-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.dec-row .step { min-width: 160px; max-width: 280px; flex: 1; }
+
+/* ─── RECONCILIATION TABLE ─── */
+.rec-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+.rec-table th {
+  background: var(--gray-bg); padding: 6px 10px;
+  text-align: left; border: 1px solid var(--border);
+  font-size: 10px; font-weight: 700; color: var(--gray);
+  text-transform: uppercase; letter-spacing: .3px;
+}
+.rec-table td { padding: 6px 10px; border: 1px solid var(--border); color: #374151; }
+.rec-table tr:nth-child(even) td { background: #f9fafb; }
+.ok  { color: #15803d; font-weight: 700; }
+.err { color: #dc2626; font-weight: 700; }
+
+/* ─── VERTICAL CONNECTOR ─── */
+.v-conn {
+  display: flex; justify-content: center; align-items: center;
+  height: 30px; font-size: 22px; color: #9ca3af;
+}
+
+/* ─── LEGEND ─── */
+.legend {
+  margin-top: 24px; padding: 12px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+}
+.legend h4 {
+  font-size: 11px; font-weight: 700; color: var(--gray);
+  margin-bottom: 9px; text-transform: uppercase; letter-spacing: .5px;
+}
+.legend-grid { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; }
+</style>
+</head>
+<body>
+
+<div class="main-title">
+  <h1>Traceability System — Refrigerant Distribution</h1>
+  <p>End-to-end process · Hybrid architecture: RFID (warehouse) + NFC + QR (field)</p>
+</div>
+
+<!-- ════════════════════════════════════
+     PHASE 1 — RECEIVING & SEALING
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-purple">
+    ⚙️ &nbsp;PHASE 1 — Warehouse: Cylinder receiving and sealing
+  </div>
+  <div class="phase-body">
+    <div class="step-row">
+
+      <div class="step purple">
+        <h3>Cylinder arrives at warehouse</h3>
+        <p>Empty returned by a customer or recharged by an external supplier</p>
+        <div class="badges"></div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step purple">
+        <h3>RFID Portal — Entry</h3>
+        <p>Reads all tags as cylinders pass through. Automatically registers IDs, status and origin in the cloud. No human intervention required.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID UHF</span>
+          <span class="badge b-auto">Automatic</span>
+        </div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step purple">
+        <h3>IoT Scale — Weigh-in</h3>
+        <p>Each cylinder passes over the scale. Tag + weight are linked in the cloud instantly. No warehouse operator enters the weight manually.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID</span>
+          <span class="badge b-iot">IoT Scale</span>
+          <span class="badge b-auto">No operator</span>
+        </div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step purple">
+        <h3>Dual NFC/UHF seal applied</h3>
+        <p>Single-use breakaway collar placed on the cylinder valve. One tag that works with the RFID portal in the warehouse and with the driver's phone in the field.</p>
+        <div class="badges">
+          <span class="badge b-nfc">NFC</span>
+          <span class="badge b-rfid">UHF</span>
+          <span class="badge b-auto">Tamper-bit</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="info-bar purple">
+      ☁️ Cloud records per cylinder: Unique ID · Gas type · Full weight · Timestamp · Warehouse operator · Seal status = INTACT
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     PHASE 2 — ORDER ASSIGNMENT & LOADING
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-blue">
+    🗂️ &nbsp;PHASE 2 — Warehouse: Order assignment and truck loading
+  </div>
+  <div class="phase-body">
+
+    <div class="section-label">Order management (platform)</div>
+    <div class="step-row">
+
+      <div class="step blue">
+        <h3>Manager creates manifest</h3>
+        <p>In the web platform: defines which specific cylinders go with which driver and to which customers for the day</p>
+        <div class="badges">
+          <span class="badge b-cloud">Management app</span>
+        </div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step blue wide">
+        <h3>Delivery manifest generated and locked</h3>
+        <p>Fixed list: Cylinder #A → Customer X · Cylinder #B → Customer Y · etc. The driver receives the manifest in their app before loading begins.</p>
+        <div class="badges">
+          <span class="badge b-auto">Automatic</span>
+          <span class="badge b-cloud">Cloud</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Physical truck loading</div>
+    <div class="step-row">
+
+      <div class="step blue">
+        <h3>Driver loads the cart</h3>
+        <p>Picks up the assigned cylinders from the warehouse. No need to scan anything individually — the portal handles it.</p>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step blue wide">
+        <h3>RFID Portal — Exit · Bulk read</h3>
+        <p>The full cart passes through the arch. All tags are read in under 3 seconds. Automatically compared against the assigned manifest.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID UHF</span>
+          <span class="badge b-auto">Bulk read</span>
+          <span class="badge b-auto">&lt; 3 seconds</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="decision-block">
+      <div class="q">Do the cylinders read at the exit portal exactly match the assigned manifest?</div>
+      <div class="dec-row">
+        <div class="step green">
+          <h3>✓ All clear</h3>
+          <p>Driver's app shows "Ready to depart". Departure time and truck GPS are logged.</p>
+          <div class="badges"><span class="badge b-auto">Continue</span></div>
+        </div>
+        <div class="step red">
+          <h3>⚠ Discrepancy detected</h3>
+          <p>Unassigned extra cylinder · missing cylinder from manifest · tamper-bit active on any seal → Immediate alert to manager. Departure blocked until resolved.</p>
+          <div class="badges">
+            <span class="badge b-alert">Manager alert</span>
+            <span class="badge b-alert">Departure blocked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-bar blue">
+      ☁️ Cloud records: Exact list of cylinders leaving · assigned driver · departure time · truck GPS coordinates
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     PHASE 3 — CUSTOMER DELIVERY
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-teal">
+    📦 &nbsp;PHASE 3 — On route: Customer delivery
+  </div>
+  <div class="phase-body">
+
+    <div class="section-label">Customer generates the authorisation (before the visit)</div>
+    <div class="step-row">
+
+      <div class="step teal">
+        <h3>Customer purchases in app</h3>
+        <p>Selects gas type and quantity in kg. Pays online (card, transfer, etc.)</p>
+        <div class="badges"><span class="badge b-qr">Customer app</span></div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step teal">
+        <h3>Platform generates unique QR</h3>
+        <p>Cryptographically signed token. Contains: gas type · authorised kg · order ID · expires in 24h · single use only.</p>
+        <div class="badges">
+          <span class="badge b-qr">Signed QR</span>
+          <span class="badge b-auto">Single use</span>
+        </div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step teal">
+        <h3>Customer receives QR</h3>
+        <p>Push notification / SMS / WhatsApp. Customer shows it on screen to the driver at the point of delivery.</p>
+        <div class="badges"><span class="badge b-qr">Customer phone</span></div>
+      </div>
+
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">At the delivery point — two mandatory simultaneous reads</div>
+    <div class="step-row">
+
+      <div class="step teal">
+        <h3>① Scans customer QR code</h3>
+        <p>Using the camera on the driver's phone. Platform validates: valid token? already used? correct gas type? within allowed time window?</p>
+        <div class="badges">
+          <span class="badge b-qr">QR</span>
+          <span class="badge b-cloud">Cloud validation</span>
+        </div>
+      </div>
+
+      <div class="arr-plus">+</div>
+
+      <div class="step teal">
+        <h3>② Taps phone on NFC seal</h3>
+        <p>Phone reads the NFC tag on the valve. Platform confirms: is this the cylinder assigned to this customer? seal intact? tamper-bit = 0?</p>
+        <div class="badges">
+          <span class="badge b-nfc">NFC</span>
+          <span class="badge b-cloud">Cloud validation</span>
+        </div>
+      </div>
+
+      <div class="arr-plus">+</div>
+
+      <div class="step teal">
+        <h3>③ GPS Geofencing check</h3>
+        <p>System verifies that the driver's GPS is within the radius of the customer's address. Prevents remote or fraudulent confirmations.</p>
+        <div class="badges">
+          <span class="badge b-auto">GPS</span>
+          <span class="badge b-auto">Geofencing</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="decision-block">
+      <div class="q">Valid QR + intact NFC seal + GPS in zone + cylinder assigned to this customer — all 3 factors OK?</div>
+      <div class="dec-row">
+        <div class="step green">
+          <h3>✓ Delivery authorised</h3>
+          <p>Driver's app unlocks the "Confirm delivery" button. Customer may break the seal.</p>
+          <div class="badges"><span class="badge b-auto">Continue</span></div>
+        </div>
+        <div class="step red">
+          <h3>⚠ One or more factors failed</h3>
+          <p>QR already used · tampered seal (tamper-bit=1) · GPS outside zone · cylinder not assigned to this customer</p>
+          <div class="badges">
+            <span class="badge b-alert">Manager alert</span>
+            <span class="badge b-alert">Delivery blocked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Delivery close-out</div>
+    <div class="step-row">
+
+      <div class="step green">
+        <h3>Customer breaks the seal</h3>
+        <p>In the physical presence of the driver. The collar is visibly destroyed. Proof that the cylinder was intact at the moment of delivery.</p>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step green">
+        <h3>Driver confirms in app</h3>
+        <p>Taps "Delivery complete". GPS coordinates and timestamp recorded automatically. Optional photo as additional evidence.</p>
+        <div class="badges">
+          <span class="badge b-qr">Driver app</span>
+          <span class="badge b-auto">GPS + timestamp</span>
+        </div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step green">
+        <h3>Customer receives digital receipt</h3>
+        <p>Instant proof of delivery: cylinder ID · gas type · kg delivered · time · driver name · system digital signature.</p>
+        <div class="badges">
+          <span class="badge b-cloud">Cloud</span>
+          <span class="badge b-auto">Automatic</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-bar teal">
+      ☁️ Cloud records: QR consumed (invalidated) · NFC seal ID · cylinder delivered · customer · kg · time · driver GPS · digital signature
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     PHASE 4 — RETURN & RECONCILIATION
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-amber">
+    🔄 &nbsp;PHASE 4 — Return to warehouse and automatic reconciliation
+  </div>
+  <div class="phase-body">
+
+    <div class="step-row">
+
+      <div class="step amber">
+        <h3>Driver returns to warehouse</h3>
+        <p>With empty cylinders returned by customers and any undelivered cylinders</p>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step amber wide">
+        <h3>RFID Portal — Entry · Bulk read</h3>
+        <p>The same arch used at exit now reads all incoming cylinders. Fully automatic — the driver does not scan anything.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID UHF</span>
+          <span class="badge b-auto">Bulk read</span>
+        </div>
+      </div>
+
+      <div class="arr">→</div>
+
+      <div class="step amber">
+        <h3>IoT Scale — Return weigh-in</h3>
+        <p>Each cylinder is weighed on entry. Empty weight recorded automatically and linked to the tag in the cloud.</p>
+        <div class="badges">
+          <span class="badge b-iot">IoT Scale</span>
+          <span class="badge b-auto">No operator</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Automatic reconciliation — 4 simultaneous checks in the cloud</div>
+    <table class="rec-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Data A (morning departure)</th>
+          <th>Data B (afternoon return)</th>
+          <th>Expected result</th>
+          <th>If there is a gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>No. of cylinders</strong></td>
+          <td>Exit portal: 12 tags</td>
+          <td>Entry portal: 12 tags</td>
+          <td class="ok">✓ 12 = 12</td>
+          <td class="err">⚠ Cylinder did not return</td>
+        </tr>
+        <tr>
+          <td><strong>Gas delivered</strong></td>
+          <td>Σ kg out − Σ kg returned</td>
+          <td>Σ kg in registered app orders</td>
+          <td class="ok">✓ Difference = 0</td>
+          <td class="err">⚠ Unaccounted gas</td>
+        </tr>
+        <tr>
+          <td><strong>Seals</strong></td>
+          <td>Status at exit: INTACT</td>
+          <td>Tamper-bit status on return</td>
+          <td class="ok">✓ Broken only if delivery recorded</td>
+          <td class="err">⚠ Broken with no delivery logged</td>
+        </tr>
+        <tr>
+          <td><strong>GPS route</strong></td>
+          <td>Customers on manifest</td>
+          <td>Stops recorded by GPS</td>
+          <td class="ok">✓ Only authorised stops</td>
+          <td class="err">⚠ Unauthorised stop detected</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-bar amber">
+      ☁️ Cloud generates end-of-day report per driver: cylinders · kg delivered · deviations detected · route duration
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     PHASE 5 — DASHBOARD & ALERTS
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-green">
+    📊 &nbsp;PHASE 5 — Manager dashboard: real-time alerts and ongoing audit
+  </div>
+  <div class="phase-body">
+    <div class="step-row">
+
+      <div class="step red">
+        <h3>⚡ Real-time alerts</h3>
+        <p>Extra cylinder at exit portal · tamper-bit active on a seal · QR scanned twice · driver GPS outside customer zone · cylinder did not return to warehouse</p>
+        <div class="badges">
+          <span class="badge b-alert">Immediate</span>
+          <span class="badge b-alert">Push to manager</span>
+        </div>
+      </div>
+
+      <div class="arr">+</div>
+
+      <div class="step amber">
+        <h3>📈 Deviation analytics</h3>
+        <p>Monthly kg deviation per driver. Statistical anomaly patterns. Cross-driver comparison. Early detection of systematic collusion.</p>
+        <div class="badges">
+          <span class="badge b-iot">Analytics</span>
+          <span class="badge b-cloud">Dashboard</span>
+        </div>
+      </div>
+
+      <div class="arr">+</div>
+
+      <div class="step green">
+        <h3>🔍 Full traceability</h3>
+        <p>Every cylinder has a complete history: who loaded it · when it left · which customer received it · how much gas it held · seal status at each checkpoint.</p>
+        <div class="badges">
+          <span class="badge b-auto">Auditable</span>
+          <span class="badge b-cloud">Cloud</span>
+        </div>
+      </div>
+
+      <div class="arr">+</div>
+
+      <div class="step blue">
+        <h3>🧾 Automated reports</h3>
+        <p>Daily / weekly / monthly report per driver. Exportable for HR, operations and — if needed — as legal evidence.</p>
+        <div class="badges">
+          <span class="badge b-auto">Automatic</span>
+          <span class="badge b-cloud">Exportable</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="info-bar green">
+      🎯 Goal: theft is not prevented purely by physical means — it is made pointless and detectable. Every kg of gas has a digital fingerprint from the moment it leaves the warehouse until it reaches the customer.
+    </div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <h4>Technology legend</h4>
+  <div class="legend-grid">
+    <div class="legend-item"><span class="badge b-rfid">RFID UHF</span> Fixed portal at warehouse — bulk contactless read at 1–3 m</div>
+    <div class="legend-item"><span class="badge b-nfc">NFC</span> Driver's phone — individual seal read in the field</div>
+    <div class="legend-item"><span class="badge b-qr">QR</span> Customer app — signed, single-use order authorisation</div>
+    <div class="legend-item"><span class="badge b-iot">IoT Scale</span> Automated weighing connected to the cloud, no human input</div>
+    <div class="legend-item"><span class="badge b-auto">Automatic</span> Action with no human intervention, logged directly to the cloud</div>
+    <div class="legend-item"><span class="badge b-alert">Alert</span> Instant push notification to manager with full event detail</div>
+    <div class="legend-item"><span class="badge b-cloud">Cloud</span> Data recorded in the central platform with timestamp and full traceability</div>
+  </div>
+  <p style="margin-top:10px; font-size:10px; color:#9ca3af;">
+    The seal carries a single dual NFC+UHF tag: the warehouse RFID portal reads it at distance · the driver's phone reads it via NFC · one physical seal for the entire cylinder lifecycle.
+  </p>
+</div>
+
+</body>
+</html>
