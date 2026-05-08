@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proceso Completo — Distribución de Refrigerante</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #f8fafc;
+  color: #111827;
+  padding: 24px 20px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ─── TOKENS ─── */
+:root {
+  --purple:  #7c3aed; --purple-bg: #ede9fe; --purple-bd: #c4b5fd;
+  --teal:    #0f766e; --teal-bg:   #ccfbf1; --teal-bd:   #5eead4;
+  --amber:   #92400e; --amber-bg:  #fef3c7; --amber-bd:  #fcd34d;
+  --blue:    #1e40af; --blue-bg:   #dbeafe; --blue-bd:   #93c5fd;
+  --green:   #14532d; --green-bg:  #dcfce7; --green-bd:  #86efac;
+  --red:     #991b1b; --red-bg:    #fee2e2; --red-bd:    #fca5a5;
+  --gray:    #374151; --gray-bg:   #f3f4f6; --gray-bd:   #d1d5db;
+  --white:   #ffffff;
+  --border:  #e5e7eb;
+}
+
+/* ─── HEADER ─── */
+.main-title {
+  text-align: center; margin-bottom: 28px;
+}
+.main-title h1 {
+  font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 4px;
+}
+.main-title p { font-size: 13px; color: #6b7280; }
+
+/* ─── PHASE WRAPPER ─── */
+.phase { margin-bottom: 6px; }
+
+.phase-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; border-radius: 10px 10px 0 0;
+  color: #fff; font-size: 13px; font-weight: 700;
+  letter-spacing: .1px;
+}
+.ph-purple { background: var(--purple); }
+.ph-blue   { background: var(--blue);   }
+.ph-teal   { background: var(--teal);   }
+.ph-amber  { background: #b45309; }
+.ph-green  { background: var(--green);  }
+.ph-gray   { background: var(--gray);   }
+
+.phase-body {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 14px 16px 16px;
+}
+
+/* ─── STEP ROW ─── */
+.step-row {
+  display: flex; align-items: stretch; gap: 0;
+  flex-wrap: nowrap; overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+/* ─── ARROW between steps ─── */
+.arr {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 6px; font-size: 20px; color: #9ca3af;
+  flex-shrink: 0; align-self: center;
+}
+.arr-plus {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 6px; font-size: 18px; font-weight: 700; color: #9ca3af;
+  flex-shrink: 0; align-self: center;
+}
+
+/* ─── STEP CARD ─── */
+.step {
+  flex: 1; min-width: 150px; max-width: 260px;
+  border-radius: 8px; padding: 11px 13px 12px;
+  border: 1.5px solid var(--gray-bd);
+  background: var(--gray-bg);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.step h3 { font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.3; }
+.step p  { font-size: 11px; color: #4b5563; line-height: 1.45; flex: 1; }
+
+.step.purple { background: var(--purple-bg); border-color: var(--purple-bd); }
+.step.teal   { background: var(--teal-bg);   border-color: var(--teal-bd);   }
+.step.amber  { background: var(--amber-bg);  border-color: var(--amber-bd);  }
+.step.blue   { background: var(--blue-bg);   border-color: var(--blue-bd);   }
+.step.green  { background: var(--green-bg);  border-color: var(--green-bd);  }
+.step.red    { background: var(--red-bg);    border-color: var(--red-bd);    }
+.step.wide   { flex: 2; max-width: 400px; }
+
+/* ─── BADGE ─── */
+.badges { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+.badge {
+  font-size: 9px; font-weight: 700; padding: 2px 7px;
+  border-radius: 20px; color: #fff; letter-spacing: .3px;
+  white-space: nowrap;
+}
+.b-rfid   { background: var(--purple); }
+.b-nfc    { background: var(--teal);   }
+.b-qr     { background: var(--blue);   }
+.b-iot    { background: #b45309; }
+.b-auto   { background: var(--green);  }
+.b-alert  { background: var(--red);    }
+.b-cloud  { background: #0369a1; }
+
+/* ─── INFO BAR ─── */
+.info-bar {
+  margin-top: 10px; padding: 9px 13px;
+  border-radius: 6px; font-size: 11px;
+  border-left: 3px solid;
+}
+.info-bar.purple { background: var(--purple-bg); border-color: var(--purple); color: var(--purple); font-weight: 600; }
+.info-bar.blue   { background: var(--blue-bg);   border-color: var(--blue);   color: var(--blue);   font-weight: 600; }
+.info-bar.teal   { background: var(--teal-bg);   border-color: var(--teal);   color: var(--teal);   font-weight: 600; }
+.info-bar.amber  { background: var(--amber-bg);  border-color: #b45309;       color: #92400e;       font-weight: 600; }
+.info-bar.green  { background: var(--green-bg);  border-color: var(--green);  color: var(--green);  font-weight: 600; }
+
+/* ─── SECTION LABEL inside phase ─── */
+.section-label {
+  font-size: 11px; font-weight: 700; color: #374151;
+  margin: 12px 0 7px; padding-left: 2px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* ─── DECISION BLOCK ─── */
+.decision-block {
+  margin: 12px 0 4px;
+  border: 1.5px dashed var(--gray-bd);
+  border-radius: 8px; padding: 12px 14px;
+  background: var(--gray-bg);
+}
+.decision-block .q {
+  font-size: 12px; font-weight: 700; color: #374151;
+  margin-bottom: 10px; text-align: center;
+}
+.dec-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.dec-row .step { min-width: 160px; max-width: 280px; flex: 1; }
+
+/* ─── RECONCILIATION TABLE ─── */
+.rec-table {
+  width: 100%; border-collapse: collapse;
+  margin-top: 10px; font-size: 11px;
+}
+.rec-table th {
+  background: var(--gray-bg); padding: 6px 10px;
+  text-align: left; border: 1px solid var(--border);
+  font-size: 10px; font-weight: 700; color: var(--gray);
+  text-transform: uppercase; letter-spacing: .3px;
+}
+.rec-table td { padding: 6px 10px; border: 1px solid var(--border); color: #374151; }
+.rec-table tr:nth-child(even) td { background: #f9fafb; }
+.ok  { color: #15803d; font-weight: 700; }
+.err { color: #dc2626; font-weight: 700; }
+
+/* ─── VERTICAL CONNECTOR ─── */
+.v-conn {
+  display: flex; justify-content: center; align-items: center;
+  height: 30px; font-size: 22px; color: #9ca3af;
+}
+
+/* ─── LEGEND ─── */
+.legend {
+  margin-top: 24px;
+  padding: 12px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+}
+.legend h4 { font-size: 11px; font-weight: 700; color: var(--gray); margin-bottom: 9px; text-transform: uppercase; letter-spacing: .5px; }
+.legend-grid {
+  display: flex; flex-wrap: wrap; gap: 8px 20px;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; }
+
+/* ─── ACTORS HEADER ─── */
+.actors-header {
+  display: flex; gap: 0; margin-bottom: 12px;
+  border-radius: 6px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.actor {
+  flex: 1; text-align: center; padding: 6px 4px;
+  font-size: 10px; font-weight: 700; color: #fff;
+  letter-spacing: .3px;
+}
+.a-almacen  { background: #6d28d9; }
+.a-plat     { background: #0369a1; }
+.a-rep      { background: #0f766e; }
+.a-cliente  { background: #b45309; }
+</style>
+</head>
+<body>
+
+<div class="main-title">
+  <h1>Sistema de Trazabilidad — Distribución de Refrigerante</h1>
+  <p>Proceso completo · Arquitectura híbrida RFID (almacén) + NFC + QR (campo)</p>
+</div>
+
+<!-- ════════════════════════════════════
+     FASE 1 — RECEPCIÓN Y PRECINTADO
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-purple">
+    ⚙️ &nbsp;FASE 1 — Almacén: Recepción y precintado de cilindros
+  </div>
+  <div class="phase-body">
+    <div class="step-row">
+      <div class="step purple">
+        <h3>Cilindro llega a almacén</h3>
+        <p>Vacío devuelto por cliente o recargado por proveedor externo</p>
+        <div class="badges"></div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step purple">
+        <h3>Portal RFID — Entrada</h3>
+        <p>Lee todos los tags al entrar. Registra IDs, estado y origen en cloud automáticamente. Sin intervención humana.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID UHF</span>
+          <span class="badge b-auto">Automático</span>
+        </div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step purple">
+        <h3>Báscula IoT integrada</h3>
+        <p>El cilindro pasa por la báscula. Tag + peso quedan vinculados en cloud. Ningún operario introduce el peso manualmente.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID</span>
+          <span class="badge b-iot">IoT Báscula</span>
+          <span class="badge b-auto">Sin operario</span>
+        </div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step purple">
+        <h3>Se coloca precinto dual NFC/UHF</h3>
+        <p>Collar de rotura única en la válvula del cilindro. Un solo tag que funciona con portal RFID en almacén y con móvil en campo.</p>
+        <div class="badges">
+          <span class="badge b-nfc">NFC</span>
+          <span class="badge b-rfid">UHF</span>
+          <span class="badge b-auto">Tamper-bit</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-bar purple">
+      ☁️ Cloud registra por cilindro: ID único · tipo de gas · peso lleno · timestamp · operario · estado del precinto = ÍNTEGRO
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     FASE 2 — ASIGNACIÓN Y CARGA
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-blue">
+    🗂️ &nbsp;FASE 2 — Almacén: Asignación de pedidos y carga del camión
+  </div>
+  <div class="phase-body">
+
+    <div class="section-label">Gestión de pedidos (plataforma)</div>
+    <div class="step-row">
+      <div class="step blue">
+        <h3>Gestor asigna manifiesto</h3>
+        <p>En plataforma web: qué cilindros concretos van con qué repartidor y a qué clientes del día</p>
+        <div class="badges">
+          <span class="badge b-cloud">App gestión</span>
+        </div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step blue wide">
+        <h3>Manifiesto de carga generado y cerrado</h3>
+        <p>Lista inamovible: Cilindro #A → Cliente X · Cilindro #B → Cliente Y · etc. El repartidor recibe el manifiesto en su app antes de cargar.</p>
+        <div class="badges">
+          <span class="badge b-auto">Automático</span>
+          <span class="badge b-cloud">Cloud</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Carga física del camión</div>
+    <div class="step-row">
+      <div class="step blue">
+        <h3>Repartidor carga carrito</h3>
+        <p>Coge los cilindros asignados del almacén. No necesita escanear nada individualmente: el portal lo hará.</p>
+      </div>
+      <div class="arr">→</div>
+      <div class="step blue wide">
+        <h3>Portal RFID — Salida · Lectura masiva</h3>
+        <p>El carrito completo pasa por el arco. Lee todos los tags en menos de 3 segundos. Compara automáticamente con el manifiesto asignado.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID UHF</span>
+          <span class="badge b-auto">Lectura masiva</span>
+          <span class="badge b-auto">&lt; 3 segundos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-block">
+      <div class="q">¿Los cilindros leídos coinciden exactamente con el manifiesto?</div>
+      <div class="dec-row">
+        <div class="step green">
+          <h3>✓ Todo correcto</h3>
+          <p>App repartidor muestra "Listo para salir". Se registra hora de salida y GPS del camión.</p>
+          <div class="badges"><span class="badge b-auto">Continúa</span></div>
+        </div>
+        <div class="step red">
+          <h3>⚠ Discrepancia detectada</h3>
+          <p>Cilindro extra no asignado · cilindro faltante del manifiesto · tamper-bit activado en algún precinto → Alerta inmediata al gestor. Salida bloqueada hasta resolver.</p>
+          <div class="badges">
+            <span class="badge b-alert">Alerta gestor</span>
+            <span class="badge b-alert">Salida bloqueada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-bar blue">
+      ☁️ Cloud registra: lista exacta de cilindros que salen · repartidor asignado · hora de salida · GPS camión
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     FASE 3 — ENTREGA AL CLIENTE
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-teal">
+    📦 &nbsp;FASE 3 — En ruta: Entrega al cliente
+  </div>
+  <div class="phase-body">
+
+    <div class="section-label">El cliente genera la autorización (antes de la visita)</div>
+    <div class="step-row">
+      <div class="step teal">
+        <h3>Cliente compra en app</h3>
+        <p>Elige tipo de gas y cantidad en kg. Paga online (tarjeta, transferencia, etc.)</p>
+        <div class="badges"><span class="badge b-qr">App cliente</span></div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step teal">
+        <h3>Plataforma genera QR único</h3>
+        <p>Token firmado criptográficamente. Contiene: tipo de gas · kg autorizados · ID pedido · expira en 24h · de un solo uso.</p>
+        <div class="badges">
+          <span class="badge b-qr">QR firmado</span>
+          <span class="badge b-auto">Un solo uso</span>
+        </div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step teal">
+        <h3>Cliente recibe QR</h3>
+        <p>Push notification / SMS / WhatsApp. Lo muestra en pantalla al repartidor en el momento de entrega.</p>
+        <div class="badges"><span class="badge b-qr">Móvil cliente</span></div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">En el punto de entrega — dos lecturas obligatorias y simultáneas</div>
+    <div class="step-row">
+      <div class="step teal">
+        <h3>① Escanea QR del cliente</h3>
+        <p>Con la cámara del móvil del repartidor. La plataforma valida: ¿token válido? ¿ya fue usado? ¿tipo de gas correcto? ¿dentro del horario?</p>
+        <div class="badges">
+          <span class="badge b-qr">QR</span>
+          <span class="badge b-cloud">Validación cloud</span>
+        </div>
+      </div>
+      <div class="arr-plus">+</div>
+      <div class="step teal">
+        <h3>② Acerca móvil al precinto NFC</h3>
+        <p>El móvil lee el tag NFC de la válvula. La plataforma confirma: ¿es el cilindro asignado a este cliente? ¿precinto íntegro? ¿tamper-bit en 0?</p>
+        <div class="badges">
+          <span class="badge b-nfc">NFC</span>
+          <span class="badge b-cloud">Validación cloud</span>
+        </div>
+      </div>
+      <div class="arr-plus">+</div>
+      <div class="step teal">
+        <h3>③ Geofencing GPS</h3>
+        <p>El sistema verifica que el GPS del repartidor está dentro del radio de la dirección del cliente. Evita confirmaciones remotas.</p>
+        <div class="badges">
+          <span class="badge b-auto">GPS</span>
+          <span class="badge b-auto">Geofencing</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-block">
+      <div class="q">¿QR válido + NFC íntegro + GPS en zona + cilindro asignado = los 3 factores OK?</div>
+      <div class="dec-row">
+        <div class="step green">
+          <h3>✓ Entrega autorizada</h3>
+          <p>App repartidor desbloquea botón "Confirmar entrega". El cliente puede romper el precinto.</p>
+          <div class="badges"><span class="badge b-auto">Continúa</span></div>
+        </div>
+        <div class="step red">
+          <h3>⚠ Fallo en algún factor</h3>
+          <p>QR ya usado · precinto manipulado (tamper-bit=1) · GPS fuera de zona · cilindro no asignado a este cliente</p>
+          <div class="badges">
+            <span class="badge b-alert">Alerta gestor</span>
+            <span class="badge b-alert">Entrega bloqueada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Cierre de la entrega</div>
+    <div class="step-row">
+      <div class="step green">
+        <h3>Cliente rompe precinto</h3>
+        <p>En presencia física del repartidor. El precinto queda destruido visiblemente. Evidencia de que el cilindro era íntegro al entregarse.</p>
+      </div>
+      <div class="arr">→</div>
+      <div class="step green">
+        <h3>Repartidor confirma en app</h3>
+        <p>Pulsa "Entrega completada". GPS y timestamp registrados automáticamente. Foto opcional como evidencia adicional.</p>
+        <div class="badges">
+          <span class="badge b-qr">App repartidor</span>
+          <span class="badge b-auto">GPS + timestamp</span>
+        </div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step green">
+        <h3>Cliente recibe ticket digital</h3>
+        <p>Comprobante inmediato con: ID cilindro · tipo gas · kg entregados · hora · nombre repartidor · firma digital del sistema.</p>
+        <div class="badges">
+          <span class="badge b-cloud">Cloud</span>
+          <span class="badge b-auto">Automático</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-bar teal">
+      ☁️ Cloud registra: QR consumido (invalidado) · ID precinto NFC · cilindro entregado · cliente · kg · hora · GPS repartidor · firma digital
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     FASE 4 — RETORNO Y RECONCILIACIÓN
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-amber">
+    🔄 &nbsp;FASE 4 — Retorno al almacén y reconciliación automática
+  </div>
+  <div class="phase-body">
+
+    <div class="step-row">
+      <div class="step amber">
+        <h3>Repartidor regresa al almacén</h3>
+        <p>Con cilindros vacíos devueltos por clientes y cilindros no entregados (si los hay)</p>
+      </div>
+      <div class="arr">→</div>
+      <div class="step amber wide">
+        <h3>Portal RFID — Entrada · Lectura masiva</h3>
+        <p>El mismo arco de salida registra todos los cilindros que entran. Automático, sin que el repartidor escanee nada.</p>
+        <div class="badges">
+          <span class="badge b-rfid">RFID UHF</span>
+          <span class="badge b-auto">Lectura masiva</span>
+        </div>
+      </div>
+      <div class="arr">→</div>
+      <div class="step amber">
+        <h3>Báscula IoT — Retorno</h3>
+        <p>Cada cilindro se pesa al entrar. Peso vacío registrado automáticamente y vinculado al tag.</p>
+        <div class="badges">
+          <span class="badge b-iot">IoT Báscula</span>
+          <span class="badge b-auto">Sin operario</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:14px;">Reconciliación automática — 4 comparaciones simultáneas en cloud</div>
+    <table class="rec-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Dato A (salida mañana)</th>
+          <th>Dato B (retorno tarde)</th>
+          <th>Resultado esperado</th>
+          <th>Si hay diferencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Nº cilindros</strong></td>
+          <td>Portal salida: 12 tags</td>
+          <td>Portal entrada: 12 tags</td>
+          <td class="ok">✓ 12 = 12</td>
+          <td class="err">⚠ Cilindro no volvió</td>
+        </tr>
+        <tr>
+          <td><strong>Gas entregado</strong></td>
+          <td>Σ kg salida − Σ kg retorno</td>
+          <td>Σ kg pedidos registrados en app</td>
+          <td class="ok">✓ Diferencia = 0</td>
+          <td class="err">⚠ Gas no contabilizado</td>
+        </tr>
+        <tr>
+          <td><strong>Precintos</strong></td>
+          <td>Estado al salir: ÍNTEGRO</td>
+          <td>Estado al entrar según tamper-bit</td>
+          <td class="ok">✓ Roto solo si tiene entrega</td>
+          <td class="err">⚠ Roto sin entrega registrada</td>
+        </tr>
+        <tr>
+          <td><strong>GPS ruta</strong></td>
+          <td>Clientes del manifiesto</td>
+          <td>Paradas registradas por GPS</td>
+          <td class="ok">✓ Solo paradas en clientes</td>
+          <td class="err">⚠ Parada no autorizada</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-bar amber">
+      ☁️ Cloud genera informe de cierre por repartidor: cilindros · kg entregados · desviaciones detectadas · tiempo de ruta
+    </div>
+  </div>
+</div>
+
+<div class="v-conn">↓</div>
+
+<!-- ════════════════════════════════════
+     FASE 5 — DASHBOARD Y ALERTAS
+════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-header ph-green">
+    📊 &nbsp;FASE 5 — Dashboard del gestor: alertas y auditoría continua
+  </div>
+  <div class="phase-body">
+    <div class="step-row">
+      <div class="step red">
+        <h3>⚡ Alertas en tiempo real</h3>
+        <p>Cilindro extra en portal de salida · precinto con tamper-bit activo · QR escaneado dos veces · GPS fuera de zona del cliente · cilindro no volvió al almacén</p>
+        <div class="badges">
+          <span class="badge b-alert">Inmediato</span>
+          <span class="badge b-alert">Push al gestor</span>
+        </div>
+      </div>
+      <div class="arr">+</div>
+      <div class="step amber">
+        <h3>📈 Analítica de desviación</h3>
+        <p>Desviación mensual de kg por repartidor. Patrón estadístico de anomalías. Comparativa entre conductores. Detección temprana de colusión sistemática.</p>
+        <div class="badges">
+          <span class="badge b-iot">Analítica</span>
+          <span class="badge b-cloud">Dashboard</span>
+        </div>
+      </div>
+      <div class="arr">+</div>
+      <div class="step green">
+        <h3>🔍 Trazabilidad total</h3>
+        <p>Cada cilindro tiene historial completo: quién lo cargó · cuándo salió · a qué cliente fue · cuánto gas tenía · estado del precinto en cada punto.</p>
+        <div class="badges">
+          <span class="badge b-auto">Auditable</span>
+          <span class="badge b-cloud">Cloud</span>
+        </div>
+      </div>
+      <div class="arr">+</div>
+      <div class="step blue">
+        <h3>🧾 Reportes automáticos</h3>
+        <p>Informe diario/semanal/mensual por repartidor. Exportable para RR.HH., operaciones y, si es necesario, evidencia legal.</p>
+        <div class="badges">
+          <span class="badge b-auto">Automático</span>
+          <span class="badge b-cloud">Exportable</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-bar green">
+      🎯 Objetivo: el robo no se previene solo físicamente — se hace inútil y detectable. Cada kg de gas tiene una huella digital desde que sale del almacén hasta que se entrega.
+    </div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <h4>Leyenda de tecnologías</h4>
+  <div class="legend-grid">
+    <div class="legend-item"><span class="badge b-rfid">RFID UHF</span> Portal fijo en almacén — lectura masiva sin contacto a 1-3m</div>
+    <div class="legend-item"><span class="badge b-nfc">NFC</span> Móvil repartidor — lectura individual del precinto en campo</div>
+    <div class="legend-item"><span class="badge b-qr">QR</span> App cliente — autorización de pedido firmada y de un solo uso</div>
+    <div class="legend-item"><span class="badge b-iot">IoT Báscula</span> Pesaje automático conectado al cloud, sin intervención humana</div>
+    <div class="legend-item"><span class="badge b-auto">Automático</span> Acción sin intervención humana, registrada directamente en cloud</div>
+    <div class="legend-item"><span class="badge b-alert">Alerta</span> Notificación push inmediata al gestor con detalle del evento</div>
+    <div class="legend-item"><span class="badge b-cloud">Cloud</span> Dato registrado en plataforma central con timestamp y trazabilidad</div>
+  </div>
+  <p style="margin-top:10px; font-size:10px; color:#9ca3af;">
+    El precinto es un tag dual NFC+UHF: el portal RFID del almacén lo lee a distancia · el móvil del repartidor lo lee por NFC · un solo precinto físico para todo el ciclo de vida del cilindro.
+  </p>
+</div>
+
+</body>
+</html>
